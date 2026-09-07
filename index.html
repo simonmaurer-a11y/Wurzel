@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f4ee">
+<title>Wurzel – Tägliche Bibelzeit</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ee;
+    --paper: #ffffff;
+    --ink: #2b2722;
+    --ink-soft: #6b6357;
+    --moss: #51664f;
+    --moss-deep: #38473a;
+    --moss-mist: #e7ede4;
+    --clay: #cf7c52;
+    --clay-soft: #f4e2d6;
+    --line: #e8e1d3;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 60px rgba(43,39,34,0.05);
+  }
+
+  header {
+    padding: 30px 24px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .brand {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    color: var(--moss-deep);
+  }
+
+  header .streak {
+    font-size: 13px;
+    color: var(--clay);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--clay-soft);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  main {
+    flex: 1;
+    padding: 28px 24px 104px;
+  }
+
+  /* TODAY VIEW */
+  .hero-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .ring-wrap {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    flex-shrink: 0;
+  }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { stroke: var(--line); }
+  .ring-fill {
+    stroke: var(--moss);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  .ring-label {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-label .num {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--moss-deep);
+  }
+  .ring-label .pct {
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .hero-text .path-label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .hero-text .day-counter {
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .hero-text .day-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .verse-card {
+    background: var(--moss-mist);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 22px;
+  }
+
+  .verse-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--moss);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .verse-ref {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--moss-deep);
+    line-height: 1.2;
+  }
+
+  .verse-hint {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .verse-hint strong { color: var(--ink); }
+
+  .extra-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .extra-card .icon {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .extra-card .txt {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .extra-card .txt strong { color: var(--ink); font-weight: 600; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 26px;
+  }
+
+  .reflection {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 96px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  textarea:focus {
+    outline: 2px solid var(--moss);
+    outline-offset: -1px;
+  }
+  textarea::placeholder { color: #b3aa9c; }
+
+  .checkbox-row {
+    margin-top: 26px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+  }
+  .checkbox-row.done {
+    background: var(--moss-mist);
+    border-color: var(--moss);
+  }
+
+  .checkbox-box {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    border: 2px solid #c9c0b0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .checkbox-row.done .checkbox-box {
+    background: var(--moss);
+    border-color: var(--moss);
+  }
+  .checkbox-box svg {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .checkbox-row.done .checkbox-box svg { opacity: 1; }
+
+  .checkbox-text {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .checkbox-row.done .checkbox-text { color: var(--moss-deep); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 480px;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    display: flex;
+    padding: 10px 24px 18px;
+    gap: 8px;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav-btn.active {
+    background: var(--moss);
+    color: white;
+  }
+
+  /* OVERVIEW VIEW */
+  .month-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .month-tabs::-webkit-scrollbar { display: none; }
+  .month-tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .month-tab.active {
+    background: var(--moss);
+    border-color: var(--moss);
+    color: white;
+  }
+
+  .overview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .overview-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    background: var(--paper);
+  }
+  .overview-item.current {
+    border-color: var(--moss);
+    background: var(--moss-mist);
+  }
+  .overview-item .dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .overview-item.done .dot {
+    background: var(--moss);
+    border-color: var(--moss);
+  }
+  .overview-item.done .dot svg { opacity: 1; }
+  .overview-item .dot svg { width: 12px; height: 12px; opacity: 0; }
+  .overview-item .ov-ref {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .overview-item .ov-num {
+    font-size: 11px;
+    color: var(--ink-soft);
+    width: 28px;
+    font-weight: 600;
+  }
+
+  /* INFO VIEW */
+  .empty-state {
+    padding: 8px 0 40px;
+  }
+  .empty-state .big {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--moss-deep);
+  }
+  .empty-state p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+  .empty-state strong { color: var(--ink); }
+
+  .reset-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">Wurzel</div>
+    <div class="streak" id="streakDisplay">🔥 0 Tage</div>
+  </header>
+
+  <main>
+    <!-- TODAY VIEW -->
+    <div id="todayView">
+      <div class="hero-row">
+        <div class="ring-wrap">
+          <svg width="76" height="76" viewBox="0 0 76 76">
+            <circle class="ring-bg" cx="38" cy="38" r="33" fill="none" stroke-width="6"/>
+            <circle class="ring-fill" id="ringFill" cx="38" cy="38" r="33" fill="none" stroke-width="6" stroke-dasharray="207.3"/>
+          </svg>
+          <div class="ring-label">
+            <div class="num" id="ringNum">1</div>
+            <div class="pct" id="ringPct">0%</div>
+          </div>
+        </div>
+        <div class="hero-text">
+          <div class="path-label" id="themeLabel">Beziehung &amp; Glauben teilen</div>
+          <div class="day-counter" id="dayCounter">Tag 1</div>
+          <div class="day-sub">von 365 Tagen</div>
+        </div>
+      </div>
+
+      <div class="verse-card">
+        <div class="verse-eyebrow">Heutiger Abschnitt</div>
+        <div class="verse-ref" id="verseRef"></div>
+        <div class="verse-hint" id="verseHint"></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="icon">📖</div>
+        <div class="txt" id="proverbHint"></div>
+      </div>
+
+      <div class="section-label">Impuls für heute</div>
+      <div class="reflection" id="reflectionText"></div>
+
+      <div class="section-label">Deine Notiz</div>
+      <textarea id="noteInput" placeholder="Was ist dir beim Lesen aufgefallen? Was nimmst du mit?"></textarea>
+
+      <div class="checkbox-row" id="checkRow">
+        <div class="checkbox-box">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7L5.5 10.5L12 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="checkbox-text" id="checkText">Heute gelesen</div>
+      </div>
+    </div>
+
+    <!-- OVERVIEW VIEW -->
+    <div id="overviewView" class="hidden">
+      <div class="month-tabs" id="monthTabs"></div>
+      <div class="overview-list" id="overviewList"></div>
+    </div>
+
+    <!-- INFO VIEW -->
+    <div id="infoView" class="hidden">
+      <div class="empty-state">
+        <div class="big">Über Wurzel</div>
+        <p>
+          Dieser Plan begleitet dich 365 Tage durch das <strong>Neue Testament</strong>
+          und ausgewählte <strong>Psalmen</strong>, dazu täglich ein kurzer
+          <strong>Sprüche</strong> Impuls. Die Reihenfolge wechselt sich natürlich ab,
+          du musst dich um nichts kümmern außer aufzuschlagen und zu lesen.
+        </p>
+        <p>
+          Jeder Tag gehört zu einem von fünf Themen, die sich wöchentlich abwechseln:
+          <strong>Beziehung &amp; Glauben teilen</strong>,
+          <strong>Heiliger Geist &amp; geistliches Leben</strong>,
+          <strong>Begabung &amp; Berufung</strong>,
+          <strong>Nachfolge im Alltag</strong> und
+          <strong>Gottes Charakter &amp; Vertrauen</strong>.
+          Die Impulsfrage passt jeweils dazu.
+        </p>
+        <p>
+          Lies den Abschnitt in deiner <strong>NeÜ bibel.heute</strong>, lass die Frage
+          auf dich wirken, halte kurz fest was dir auffällt und setz dein Häkchen.
+          Der Tag rückt erst weiter, wenn du ihn abgeschlossen hast, also kein Druck,
+          wenn mal ein Tag dazwischen ausfällt.
+        </p>
+        <p>
+          Dein Fortschritt wird nur auf diesem Gerät gespeichert.
+        </p>
+        <button class="reset-btn" id="resetBtn">Fortschritt zurücksetzen</button>
+      </div>
+    </div>
+  </main>
+
+  <nav>
+    <button class="nav-btn active" data-view="today">Heute</button>
+    <button class="nav-btn" data-view="overview">Plan</button>
+    <button class="nav-btn" data-view="info">Info</button>
+  </nav>
+</div>
+
+<script>
+/* ---------- Bible reading plan generation ---------- */
+const NT_BOOKS = [
+  ["Matthäus",28],["Markus",16],["Lukas",24],["Johannes",21],["Apostelgeschichte",28],
+  ["Römer",16],["1. Korinther",16],["2. Korinther",13],["Galater",6],["Epheser",6],
+  ["Philipper",4],["Kolosser",4],["1. Thessalonicher",5],["2. Thessalonicher",3],
+  ["1. Timotheus",6],["2. Timotheus",4],["Titus",3],["Philemon",1],["Hebräer",13],
+  ["Jakobus",5],["1. Petrus",5],["2. Petrus",3],["1. Johannes",5],["2. Johannes",1],
+  ["3. Johannes",1],["Judas",1],["Offenbarung",22]
+];
+
+function buildNTList() {
+  const list = [];
+  NT_BOOKS.forEach(([name, chapters]) => {
+    for (let c = 1; c <= chapters; c++) list.push(`${name} ${c}`);
+  });
+  return list; // 260 entries
+}
+
+function buildPsalmList(count) {
+  const list = [];
+  for (let p = 1; p <= count; p++) list.push(`Psalm ${p}`);
+  return list;
+}
+
+function buildYearPlan() {
+  const ntList = buildNTList();      // 260
+  const psalmList = buildPsalmList(105); // 105
+  const total = 365;
+  const plan = [];
+  let ni = 0, pi = 0;
+  for (let day = 0; day < total; day++) {
+    const expectedPsalm = Math.round((day + 1) * psalmList.length / total);
+    if (pi < expectedPsalm && pi < psalmList.length) {
+      plan.push(psalmList[pi]); pi++;
+    } else if (ni < ntList.length) {
+      plan.push(ntList[ni]); ni++;
+    } else if (pi < psalmList.length) {
+      plan.push(psalmList[pi]); pi++;
+    }
+  }
+  while (plan.length < total) plan.push(ntList[ntList.length - 1]);
+  return plan;
+}
+
+const YEAR_PLAN = buildYearPlan();
+
+/* ---------- Themes & reflection questions ---------- */
+const THEMES = [
+  {
+    name: "Beziehung & Glauben teilen",
+    questions: [
+      "Wie hast du heute deinen Glauben gelebt, ohne ein Wort zu sagen?",
+      "Wofür kannst du heute für deine Partnerin beten, auch wenn sie nichts davon weiß?",
+      "Welche Eigenschaft aus dem heutigen Abschnitt brauchst du gerade am meisten in deiner Beziehung?",
+      "Wo hast du in den letzten Tagen Geduld geübt, wo hättest du es noch besser machen können?",
+      "Was bedeutet es für dich, Licht zu sein, ohne zu predigen?",
+      "Welche Sorge rund um deine Beziehung kannst du heute bewusst Gott übergeben?",
+      "Wie reagierst du, wenn das Thema Glaube zwischen euch zur Sprache kommt?",
+      "Was schätzt du an deiner Partnerin, und hast du ihr das in letzter Zeit gesagt?",
+      "Wo zeigt der heutige Abschnitt, wie Gott mit Menschen umgeht, die anders denken als er?",
+      "Welcher Gedanke aus dem Text gibt dir Hoffnung für eure Beziehung?",
+      "Was würde sich ändern, wenn du weniger überzeugen und mehr lieben würdest?",
+      "Notiere einen Moment aus dieser Woche, in dem dein Glaube und dein Alltag zusammenpassten.",
+      "Wie kannst du heute Interesse an dem zeigen, was deiner Partnerin wichtig ist?",
+      "Was lernst du heute über Geduld im Warten?"
+    ]
+  },
+  {
+    name: "Heiliger Geist & geistliches Leben",
+    questions: [
+      "Wo hast du heute den Heiligen Geist wahrgenommen, in einem Gedanken, einem Gefühl oder einer Begegnung?",
+      "Welche Frucht des Geistes fehlt dir gerade am meisten: Liebe, Freude, Friede, Geduld, Freundlichkeit, Güte, Treue, Sanftmut oder Selbstbeherrschung?",
+      "Bitte den Geist heute um etwas Konkretes. Schreib es auf.",
+      "Wo in deinem Leben fühlst du dich aktuell trocken oder leer? Was sagt der heutige Text dazu?",
+      "Wie unterscheidest du zwischen deinen eigenen Gedanken und dem, was der Geist dir zeigen will?",
+      "Was bedeutet es für dich, dass der Geist in dir wohnt?",
+      "Welche Veränderung in deinem Charakter wünschst du dir, und bittest du Gott darum?",
+      "Wo brauchst du heute Mut, den der Geist dir geben könnte?",
+      "Lies den Text noch einmal langsam. Welches Wort bleibt hängen?",
+      "Wie sieht ein Tag aus, an dem du bewusster auf den Geist hörst?",
+      "Was hindert dich oft daran, in Stille zu beten oder zu hören?",
+      "Welche Entscheidung steht an, bei der du den Geist um Weisheit bitten kannst?",
+      "Wo erlebst du Frieden, der nicht von den Umständen abhängt?",
+      "Was bedeutet für dich, im Geist zu leben statt nur nach Gefühl?"
+    ]
+  },
+  {
+    name: "Begabung & Berufung",
+    questions: [
+      "Was tust du gern und kannst dabei anderen helfen?",
+      "Wo hast du in der letzten Woche etwas getan, das sich richtig angefühlt hat?",
+      "Was würden Menschen, die dich gut kennen, als deine Stärke beschreiben?",
+      "Wo siehst du im heutigen Text ein Beispiel dafür, wie Gott unterschiedliche Menschen einsetzt?",
+      "Welche kleine Aufgabe könntest du diese Woche übernehmen, die zu deinen Stärken passt?",
+      "Was hält dich manchmal davon ab, deine Fähigkeiten einzusetzen?",
+      "Wofür hat Gott dich in deinem Umfeld vielleicht hingestellt, ohne dass es nach großer Aufgabe aussieht?",
+      "Welche Erfahrung in deinem Leben könnte anderen jetzt helfen, wenn du sie teilst?",
+      "Was bedeutet für dich, ein Teil des Ganzen zu sein, nicht alles allein machen zu müssen?",
+      "Wo könntest du heute jemandem dienen, ohne dass es groß auffällt?",
+      "Welche Begabung würdest du gern noch entdecken oder ausprobieren?",
+      "Was sagt der Text heute über den Wert von kleinen, unauffälligen Diensten?",
+      "Wie reagierst du, wenn jemand anderes für etwas gelobt wird, das du auch gut könntest?",
+      "Wofür bist du dankbar, dass Gott es dir gegeben hat?"
+    ]
+  },
+  {
+    name: "Nachfolge im Alltag",
+    questions: [
+      "Wo war Nachfolge heute konkret, in einer Entscheidung, einem Gespräch, einer Reaktion?",
+      "Was im heutigen Text fällt dir leicht, was fällt dir schwer umzusetzen?",
+      "Wo hast du heute die Wahl zwischen dem leichten und dem richtigen Weg?",
+      "Was würde sich ändern, wenn du diesen Abschnitt wörtlich nehmen würdest?",
+      "Wo brauchst du heute mehr Geduld mit dir selbst?",
+      "Welche Gewohnheit würde dir helfen, näher bei Gott zu bleiben?",
+      "Was lenkt dich aktuell am meisten ab von dem, was wirklich zählt?",
+      "Wie sah dein Tag aus, wenn du ihn aus Gottes Perspektive beschreiben würdest?",
+      "Wo hast du in dieser Woche Gnade erfahren, von Gott oder von Menschen?",
+      "Was bedeutet für dich, treu in kleinen Dingen zu sein?",
+      "Welche Beziehung in deinem Leben braucht heute etwas mehr Geduld oder Zuwendung?",
+      "Wo zeigt dir der Text, wie Jesus mit Menschen umgegangen ist, die ihn enttäuscht haben?",
+      "Was nimmst du dir für morgen vor, ganz konkret?",
+      "Wofür bist du heute dankbar, auch wenn der Tag nicht einfach war?"
+    ]
+  },
+  {
+    name: "Gottes Charakter & Vertrauen",
+    questions: [
+      "Was zeigt dir der heutige Text über Gottes Charakter?",
+      "Wo in deinem Leben fällt es dir schwer, Gott zu vertrauen?",
+      "Welche Eigenschaft Gottes brauchst du heute am meisten: Geduld, Treue, Stärke oder Nähe?",
+      "Wo hast du in der Vergangenheit erlebt, dass Gott treu war, auch wenn es lange gedauert hat?",
+      "Was würde sich ändern, wenn du wirklich glaubst, dass Gott gut ist, auch in dieser Situation?",
+      "Welche Sorge trägst du gerade, die eigentlich Gottes Sache ist?",
+      "Wie hat sich dein Bild von Gott in den letzten Monaten verändert?",
+      "Was bedeutet für dich, dass Gott dich kennt, auch die Seiten, die du nicht zeigst?",
+      "Wo im Text siehst du, wie Gott Geduld mit Menschen hat?",
+      "Was hilft dir, in schwierigen Zeiten nicht aufzugeben?",
+      "Welches Versprechen aus der Bibel ist dir besonders wichtig geworden?",
+      "Wo zeigt dir der heutige Abschnitt, dass Gott im Detail handelt?",
+      "Was bedeutet Ruhe für dich, und wo findest du sie bei Gott?",
+      "Wofür dankst du Gott heute, auch wenn es klein ist?"
+    ]
+  }
+];
+
+function getTheme(dayIndex) {
+  const weekIndex = Math.floor(dayIndex / 7);
+  return THEMES[weekIndex % THEMES.length];
+}
+
+function getReflection(dayIndex) {
+  const theme = getTheme(dayIndex);
+  const q = theme.questions[dayIndex % theme.questions.length];
+  return { theme: theme.name, question: q };
+}
+
+function getProverb(dayIndex) {
+  const chapter = (dayIndex % 31) + 1;
+  return `Sprüche ${chapter}`;
+}
+
+/* ---------- State ---------- */
+const STORAGE_KEY = "wurzel_progress_v2";
+const CIRC = 2 * Math.PI * 33; // ~207.3
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { return JSON.parse(raw); } catch(e) {}
+  }
+  return { currentDay: 0, completed: {}, notes: {}, lastCompletedDate: null, streak: 0 };
+}
+function saveState(state) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+let state = loadState();
+let currentMonthTab = Math.floor(state.currentDay / 30);
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+}
+
+/* ---------- Render ---------- */
+function render() {
+  const idx = state.currentDay;
+  const ref = YEAR_PLAN[idx];
+  const refl = getReflection(idx);
+  const completedCount = Object.values(state.completed).filter(Boolean).length;
+
+  document.getElementById("themeLabel").textContent = refl.theme;
+  document.getElementById("dayCounter").textContent = `Tag ${idx+1}`;
+  document.getElementById("verseRef").textContent = ref;
+  document.getElementById("verseHint").innerHTML = `Schlag <strong>${ref}</strong> in deiner NeÜ bibel.heute auf und lies den Abschnitt aufmerksam, bevor du weitermachst.`;
+  document.getElementById("proverbHint").innerHTML = `<strong>${getProverb(idx)}</strong> als kurzer Impuls für nebenbei, ein Kapitel Weisheit für den Tag.`;
+  document.getElementById("reflectionText").textContent = refl.question;
+  document.getElementById("noteInput").value = state.notes[idx] || "";
+
+  const isDone = !!state.completed[idx];
+  const checkRow = document.getElementById("checkRow");
+  checkRow.classList.toggle("done", isDone);
+  document.getElementById("checkText").textContent = isDone ? "Heute erledigt ✓" : "Heute gelesen";
+
+  document.getElementById("streakDisplay").textContent = `🔥 ${state.streak} ${state.streak === 1 ? "Tag" : "Tage"}`;
+
+  const pct = completedCount / 365;
+  const offset = CIRC * (1 - pct);
+  document.getElementById("ringFill").style.strokeDashoffset = offset;
+  document.getElementById("ringNum").textContent = completedCount;
+  document.getElementById("ringPct").textContent = `${Math.round(pct*100)}%`;
+
+  renderMonthTabs();
+  renderOverview();
+}
+
+function renderMonthTabs() {
+  const wrap = document.getElementById("monthTabs");
+  wrap.innerHTML = "";
+  const months = 13;
+  for (let m = 0; m < months; m++) {
+    const startDay = m * 30;
+    if (startDay >= 365) break;
+    const tab = document.createElement("button");
+    tab.className = "month-tab" + (m === currentMonthTab ? " active" : "");
+    tab.textContent = `Monat ${m+1}`;
+    tab.addEventListener("click", () => {
+      currentMonthTab = m;
+      renderMonthTabs();
+      renderOverview();
+    });
+    wrap.appendChild(tab);
+  }
+}
+
+function renderOverview() {
+  const list = document.getElementById("overviewList");
+  list.innerHTML = "";
+  const start = currentMonthTab * 30;
+  const end = Math.min(start + 30, 365);
+  for (let i = start; i < end; i++) {
+    const item = document.createElement("div");
+    item.className = "overview-item";
+    if (state.completed[i]) item.classList.add("done");
+    if (i === state.currentDay) item.classList.add("current");
+    item.innerHTML = `
+      <div class="ov-num">${i+1}</div>
+      <div class="dot">
+        <svg viewBox="0 0 14 14" fill="none">
+          <path d="M2 7L5.5 10.5L12 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ov-ref">${YEAR_PLAN[i]}</div>
+    `;
+    item.addEventListener("click", () => {
+      state.currentDay = i;
+      saveState(state);
+      switchView("today");
+      render();
+    });
+    list.appendChild(item);
+  }
+}
+
+/* ---------- Interactions ---------- */
+document.getElementById("noteInput").addEventListener("input", (e) => {
+  state.notes[state.currentDay] = e.target.value;
+  saveState(state);
+});
+
+document.getElementById("checkRow").addEventListener("click", () => {
+  const idx = state.currentDay;
+  const wasDone = !!state.completed[idx];
+
+  if (!wasDone) {
+    state.completed[idx] = true;
+    const today = todayStr();
+    if (state.lastCompletedDate !== today) {
+      state.streak = (state.streak || 0) + 1;
+      state.lastCompletedDate = today;
+    }
+    if (idx < 364) {
+      state.currentDay = idx + 1;
+      currentMonthTab = Math.floor(state.currentDay / 30);
+    }
+  } else {
+    state.completed[idx] = false;
+  }
+
+  saveState(state);
+  render();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (confirm("Wirklich deinen gesamten Fortschritt zurücksetzen?")) {
+    state = { currentDay: 0, completed: {}, notes: {}, lastCompletedDate: null, streak: 0 };
+    currentMonthTab = 0;
+    saveState(state);
+    switchView("today");
+    render();
+  }
+});
+
+function switchView(view) {
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+  document.getElementById("todayView").classList.toggle("hidden", view !== "today");
+  document.getElementById("overviewView").classList.toggle("hidden", view !== "overview");
+  document.getElementById("infoView").classList.toggle("hidden", view !== "info");
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchView(btn.dataset.view));
+});
+
+render();
+
+if ("serviceWorker" in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('fetch', e => {});
+  `;
+  const blob = new Blob([swCode], { type: "application/javascript" });
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+</script>
+</body>
+</html>
